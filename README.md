@@ -142,9 +142,10 @@ will not be parsed. This is for efficiency and because most don't need
 it. This also means your `PATH` is not respected of course so you must
 specify the full path to any command. If you need something more
 complicated, you can add your commands in an executable personal script,
-e.g. `~/bin/libinput-gestures.sh` e.g. with a `#!/bin/sh` shebang . Run
-that script by hand until you get it working then configure the script
-path as your command in your `libinput-gestures.conf`.
+e.g. `~/bin/libinput-gestures.sh` with a `#!/bin/sh` shebang. Optionally
+that script can take arguments. Run that script by hand until you get it
+working then configure the script path as your command in your
+`libinput-gestures.conf`.
 
 In most cases, `libinput-gestures` automatically determines your
 touchpad device. However, you can specify it in your configuration file
