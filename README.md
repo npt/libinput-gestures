@@ -201,9 +201,9 @@ repository, and try again.
 By default, `libinput-gestures` is started with your DE as a desktop
 application. There is also an option to start as a [systemd user
 service](https://wiki.archlinux.org/title/Systemd/User). However, on
-many systems this is unreliable (on system restart, the application will
-get started but occasionally will be unable to receive commands). If you
-really want to try it, type:
+some systems this can be unreliable (on system restart, the application
+will get started but occasionally will be unable to receive commands).
+If you want to try it, type:
 
     libinput-gestures-setup stop service autostart start
 
