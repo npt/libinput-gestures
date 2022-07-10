@@ -1,4 +1,5 @@
 ### LIBINPUT-GESTURES
+[![AUR](https://img.shields.io/aur/version/libinput-gestures)](https://aur.archlinux.org/packages/libinput-gestures/)
 
 [Libinput-gestures][REPO] is a utility which reads [libinput
 gestures](https://wayland.freedesktop.org/libinput/doc/latest/gestures.html)
