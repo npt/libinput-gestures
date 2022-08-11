@@ -26,8 +26,7 @@ uninstall:
 check:
 	flake8 libinput-gestures internal internal-test
 	shellcheck $(SHELLCHECK_OPTS) libinput-gestures-setup list-version-hashes libinput-dummy
-	vermin --no-tips -i -t 3.5 libinput-gestures
-	vermin --no-tips -i internal internal-test
+	vermin --no-tips -i libinput-gestures internal internal-test
 
 test:
 	@./internal-test
