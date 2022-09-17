@@ -29,6 +29,7 @@ session_locked = False
 
 PROGPATH = Path(sys.argv[0])
 PROGNAME = PROGPATH.stem
+HOME = Path('~').expanduser()
 
 # Conf file containing gesture commands.
 # Search first for user file then system file.
@@ -210,7 +211,7 @@ def add_internal_command(cls):
 class ArgumentParser(argparse.ArgumentParser):
     'Custom ArgumentParser to return error text'
     def error(self, msg):
-        raise(Exception(msg))
+        raise Exception(msg)
 
 @add_internal_command
 class COMMAND_internal(COMMAND):
@@ -606,13 +607,12 @@ def get_conf(conffile, confname):
 
 def unexpanduser(cfile):
     'Return absolute path name, with $HOME replaced by ~'
-    relslash = Path(os.path.abspath(str(cfile)))
-    try:
-        relhome = relslash.relative_to(os.getenv('HOME'))
-    except (ValueError, TypeError):
-        relhome = None
+    cfile_abs = cfile.resolve()
 
-    return ('~/' + str(relhome)) if relhome else str(relslash)
+    if cfile_abs.parts[:len(HOME.parts)] != HOME.parts:
+        return str(cfile_abs)
+
+    return str(Path('~', *cfile_abs.parts[len(HOME.parts):]))
 
 # Search for configuration file. Use file given as command line
 # argument, else look for file in search dir order.
