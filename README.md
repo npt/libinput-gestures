@@ -208,7 +208,7 @@ If you want to try it, type:
 
     libinput-gestures-setup stop service autostart start
 
-Switch back to the default desktop option with the command:
+You can switch back to the desktop option with the command:
 
     libinput-gestures-setup stop desktop autostart start
 
@@ -258,7 +258,7 @@ gestures:
 - 3 finger swipe left/right changes workspaces
 
 GNOME 40.0 does not use 4 finger gestures so you can freely assign them
-using libinput-gestures.
+using `libinput-gestures`.
 
 GNOME 3.38 on Wayland and earlier natively implements the following
 gestures:
@@ -355,12 +355,17 @@ configuration you are using, regardless of what the issue is about**.
 6. Run `libinput-gestures` in raw mode by repeating the same commands as
    above step but use the `-r` (`--raw`) switch instead of `-d`
    (`--debug`). Raw mode does nothing more than echo the raw gesture
-   events received from `libinput debug-events`. If you see `POINTER_*`
-   events but no `GESTURE_*` events then unfortunately your touchpad
-   and/or libinput combination can report simple finger movements but
-   does not report multi-finger gestures so `libinput-gestures` will not
-   work. Also note that discrimination of gestures is done completely
-   within libinput, before they get to `libinput-gestures`.
+   events received from `libinput debug-events`. You should see the
+   following types of events when you move your fingers:
+
+   - 1 and 2 finger movements should output `POINTER_*` type events
+   - 3 (and above) finger movements should output `GESTURE_*` type events.
+
+   If you do not see any `GESTURE_*` events then unfortunately your
+   touchpad and/or libinput does not report multi-finger gestures so
+   `libinput-gestures` can not work. The discrimination of
+   gestures is done completely within libinput, before they get passed
+   to `libinput-gestures`.
 
 7. Search the web for Linux kernel and/or libinput issues relating to
    your specific touchpad device and/or laptop/pc. Update your BIOS if
