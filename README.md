@@ -12,6 +12,10 @@ for creating this is to use triple swipe up/down to switch workspaces,
 and triple swipe right/left to go backwards/forwards in my browser, as
 per the default configuration.
 
+Note that [libinput does not interpret gestures for
+touchscreens](https://wayland.freedesktop.org/libinput/doc/latest/gestures.html#touchscreen-gestures)
+so this utility can only be used for a touchpad, not a touchscreen.
+
 This small and simple utility is only intended to be used temporarily
 until GNOME and other DE's action libinput gestures natively. It parses
 the output of the _libinput list-devices_ and _libinput debug-events_
