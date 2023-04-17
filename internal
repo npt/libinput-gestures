@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 'Command line program to exercise/test/debug the _internal command.'
 # Mark Blakeney, Oct 2019
-import sys, importlib, argparse
+import sys
+import importlib
+import argparse
 from pathlib import Path
 
 CMD = '_internal'

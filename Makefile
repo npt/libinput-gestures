@@ -24,7 +24,7 @@ uninstall:
 	@./libinput-gestures-setup -d "$(DESTDIR)" uninstall
 
 check:
-	flake8 libinput-gestures internal internal-test
+	ruff libinput-gestures internal internal-test
 	shellcheck $(SHELLCHECK_OPTS) libinput-gestures-setup list-version-hashes libinput-dummy
 	vermin --no-tips -i libinput-gestures internal internal-test
 
