@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 'Read gestures from libinput touchpad and action shell commands.'
 # Mark Blakeney, Sep 2015.
-import os
-import sys
 import argparse
-import subprocess
-import shlex
-import re
-import getpass
 import fcntl
-import platform
-import math
+import getpass
 import hashlib
+import math
+import os
+import platform
+import re
+import shlex
+import subprocess
+import sys
 import threading
-from time import monotonic
 from collections import OrderedDict
 from pathlib import Path
+from time import monotonic
 
 dbus_imported = True
 try:
@@ -619,12 +619,12 @@ def unexpanduser(cfile):
 def read_conf(conffile, defname):
     if conffile:
         confpath = Path(conffile)
-        if not confpath.exists():
-            sys.exit(f'Conf file "{conffile}" does not exist.')
+        if not confpath.is_file():
+            sys.exit(f'Conf file "{conffile}" is not a file or does not exist.')
     else:
         for confdir in CONFDIRS:
             confpath = Path(confdir, defname)
-            if confpath.exists():
+            if confpath.is_file():
                 break
         else:
             opts = ' or '.join([unexpanduser(Path(c)) for c in CONFDIRS])
