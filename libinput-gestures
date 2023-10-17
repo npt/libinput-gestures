@@ -56,18 +56,20 @@ timeoutv = DEFAULT_TIMEOUT
 # Rotation threshold in degrees to discriminate pinch rotate from in/out
 ROTATE_ANGLE = 15.0
 
-def open_lock(*args):
-    'Create lock/pid files based on given list of arguments'
+def open_lock(user):
+    'Create and return lock and pid files for given user'
     # We use exclusive assess to a file for this
-    fname = Path('/tmp', '-'.join(args))
+    dirname = Path('/tmp', PROGNAME)
+    dirname.mkdir(exist_ok=True)
+    fname = dirname / user
     flock = fname.with_suffix('.lock').open('w')
     try:
         fcntl.lockf(flock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
         return None, None
 
-    fpid = fname.with_suffix('.pid').open('w')
-    return flock, fpid
+    # Return lock file and pid file handles
+    return flock, fname.with_suffix('.pid').open('w')
 
 def run(cmd, *, check=True, block=True):
     'Run function and return standard output, Popen() handle, or None'
@@ -758,7 +760,10 @@ def main():
 
     # Make sure only one instance running for current user
     user = getpass.getuser()
-    lockfile, pidfile = open_lock(PROGNAME, user)
+    lockfile, pidfile = open_lock(user)
+
+    # Note we get the lockfile back merely to keep it held open for this
+    # running instance
     if not lockfile:
         sys.exit(f'{PROGNAME} is already running for {user}, terminating ..')
 

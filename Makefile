@@ -26,7 +26,7 @@ uninstall:
 check:
 	ruff libinput-gestures internal internal-test
 	shellcheck $(SHELLCHECK_OPTS) libinput-gestures-setup list-version-hashes libinput-dummy
-	vermin --no-tips -i libinput-gestures internal internal-test
+	vermin -vv --no-tips -i libinput-gestures internal internal-test
 
 test:
 	@./internal-test
