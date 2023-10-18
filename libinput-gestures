@@ -59,17 +59,15 @@ ROTATE_ANGLE = 15.0
 def open_lock(user):
     'Create and return lock and pid files for given user'
     # We use exclusive assess to a file for this
-    dirname = Path('/tmp', PROGNAME)
-    dirname.mkdir(exist_ok=True)
-    fname = dirname / user
-    flock = fname.with_suffix('.lock').open('w')
+    flock = Path(f'/tmp/{PROGNAME}-{user}.lock')
+    flock_fp = flock.open('w')
     try:
-        fcntl.lockf(flock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        fcntl.lockf(flock_fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
         return None, None
 
     # Return lock file and pid file handles
-    return flock, fname.with_suffix('.pid').open('w')
+    return flock_fp, flock.with_suffix('.pid').open('w')
 
 def run(cmd, *, check=True, block=True):
     'Run function and return standard output, Popen() handle, or None'

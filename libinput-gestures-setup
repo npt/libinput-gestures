@@ -118,7 +118,7 @@ de_auto_start() {
 # Action given user command
 user_action() {
     local cmd="$1"
-    local pidfile=/tmp/$NAME/$USER.pid
+    local pidfile=/tmp/$NAME-$USER.pid
 
     # Test if systemd is enabled/running
     if [[ $HAS_SYSD -eq 1 ]]; then
