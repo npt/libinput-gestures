@@ -5,13 +5,15 @@
 PROG="$(basename $0)"
 NAME=${PROG%-*}
 
-BINDIR="/usr/bin"
-SYSDIR="/usr/lib/systemd/user"
-APPDIR="/usr/share/applications"
-ICOBAS="/usr/share/icons/hicolor"
+PREFIX="/usr/local"
+
+BINDIR="$PREFIX/bin"
+SYSDIR="$PREFIX/lib/systemd/user"
+APPDIR="$PREFIX/share/applications"
+ICOBAS="$PREFIX/share/icons/hicolor"
 ICODIR="$ICOBAS/128x128/apps"
-OCODIR="/usr/share/pixmaps"
-DOCDIR="/usr/share/doc/$NAME"
+OCODIR="$PREFIX/share/pixmaps"
+DOCDIR="$PREFIX/share/doc/$NAME"
 CNFDIR="/etc"
 HCFDIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 AUTDIR="$HCFDIR/autostart"
