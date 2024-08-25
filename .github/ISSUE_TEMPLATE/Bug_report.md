@@ -1,15 +1,7 @@
----
-name: New Issue
-about: Create a new issue report
-
----
-
 Before creating a new issue, please follow each step in the TROUBLESHOOTING section
 of the main README.
 
+**Please ensure you paste the output from the following command whenever you raise any issue**:
 ```
-Run libinput-gestures -l on the command line and paste the output here.
+libinput-gestures -l
 ```
-
-**Describe the issue**
-A clear and concise description of what the issue is.
