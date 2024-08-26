@@ -56,10 +56,14 @@ while read hashc; do
 
     filelist="$hashc:$MAINPROG"
     if [[ $OLDCALC -eq 0 ]]; then
-	filelist="$filelist $hashc:$MAINPROG-setup"
+	filelist2="$hashc:$MAINPROG-setup"
+	# Check the setup file exists in this (potentially old) commit
+	if git cat-file -t "$filelist2" &>/dev/null; then
+	    filelist="$filelist $filelist2"
+	fi
     fi
 
-    output $tag "$(git show $filelist 2>/dev/null | $SUMPROG)"
+    output $tag "$(git show $filelist | $SUMPROG)"
 done <<< "$(git rev-list --all --reverse)"
 
 # Output a version for the working tree as well
