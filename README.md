@@ -34,7 +34,7 @@ https://github.com/bulletmark/libinput-gestures.
 
 ### INSTALLATION
 
-You need _python_ 3.6 or later, _python2_ is not supported. You also need
+You need _python_ 3.7 or later, _python2_ is not supported. You also need
 _libinput_ release 1.0 or later.
 
 You **must be a member of the _input_ group** to have permission
