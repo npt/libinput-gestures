@@ -13,7 +13,6 @@ import shlex
 import subprocess
 import sys
 import threading
-from collections import OrderedDict
 from pathlib import Path
 from time import monotonic
 
@@ -202,7 +201,7 @@ class COMMAND:
         return self.reprstr
 
 # Table of internal commands
-internal_commands = OrderedDict()
+internal_commands = {}
 
 def add_internal_command(cls):
     'Add configuration command to command lookup table based on name'
@@ -358,7 +357,7 @@ class COMMAND_internal(COMMAND):
                 if index != start else None
 
 # Table of gesture handlers
-handlers = OrderedDict()
+handlers = {}
 
 def add_gesture_handler(cls):
     'Create gesture handler instance and add to lookup table based on name'
@@ -366,27 +365,42 @@ def add_gesture_handler(cls):
 
 class GESTURE:
     'Abstract base class for handling for gestures'
+    extended_text = ''
+    option_text = ''
+
     def __init__(self):
         'Initialise this gesture at program start'
         self.name = type(self).__name__
-        self.motions = OrderedDict()
+        self.motions = {}
+        self.options = {}
         self.has_extended = False
 
     def add(self, motion, fingers, command):
         'Add a configured motion command for this gesture'
-        if motion not in self.SUPPORTED_MOTIONS:
+        motion_key = motion
+
+        if self.option_text:
+            if self.option_text in motion:
+                motion_key, option = motion.split(self.option_text, maxsplit=1)
+                err = self.check_option(option)
+                if err:
+                    return err
+
+        if motion_key not in self.SUPPORTED_MOTIONS:
             opts = '" or "'.join(self.SUPPORTED_MOTIONS)
+            if self.option_text:
+                opts += '" or "' + \
+                        '" or "'.join(f'{i}{self.option_text}option' for
+                                      i in self.SUPPORTED_MOTIONS)
             return f'Gesture {self.name.lower()} does not support '\
-                    f'motion "{motion}".\nMust be "{opts}"'
+                    f'motion "{motion_key}".\nMust be "{opts}"'
         if not command:
             return 'No command configured'
 
         # If any extended gestures configured then set flag to enable
         # their discrimination
-        if self.extended_text and self.extended_text in motion:
+        if self.extended_text and self.extended_text in motion_key:
             self.has_extended = True
-
-        key = (motion, fingers) if fingers else motion
 
         try:
             cmds = shlex.split(command)
@@ -394,6 +408,7 @@ class GESTURE:
             return str(e)
 
         cls = internal_commands.get(cmds[0], COMMAND)
+        key = (motion, fingers) if fingers else motion
 
         try:
             self.motions[key] = cls(cmds)
@@ -408,10 +423,14 @@ class GESTURE:
         self.data = [0.0, 0.0]
         self.starttime = monotonic()
 
-    def action(self, motion):
+    def update(self, coords):
+        return True
+
+    def action(self, motion, *, command=None):
         'Action a motion command for this gesture'
-        command = self.motions.get((motion, self.fingers)) or \
-                self.motions.get(motion)
+        if command is None:
+            command = self.motions.get((motion, self.fingers)) or \
+                    self.motions.get(motion)
 
         if args.verbose:
             print(f'{PROGNAME}: {self.name} {motion} '
@@ -419,13 +438,17 @@ class GESTURE:
             if command:
                 print('  ', command)
 
-        if timeoutv > 0 and (self.starttime + timeoutv) < monotonic():
+        if self.timeout > 0 and (self.starttime + self.timeout) < monotonic():
             if args.verbose:
                 print('  ', 'timeout - no action')
             return
 
         if command and not args.debug:
             command.run()
+
+    def complete_setup(self):
+        'Complete setup of this gesture'
+        self.timeout = timeoutv
 
 @add_gesture_handler
 class SWIPE(GESTURE):
@@ -503,17 +526,65 @@ class PINCH(GESTURE):
 class HOLD(GESTURE):
     'Class to handle this type of gesture'
     SUPPORTED_MOTIONS = ('on',)
-    extended_text = None
+    option_text = '+'
 
-    def update(self, coords):
-        return True
+    def check_option(self, option):
+        try:
+            _ = float(option)
+        except Exception:
+            return f'Hold delay "{option}" must be an integer or float value.'
+        return None
+
+    def complete_setup(self):
+        'Complete setup of this gesture'
+        # No timeout on HOLD gestures
+        self.timeout = 0
+        self.delays = {}
+
+        # We parse the motions table to set up a table of delays for efficient
+        # lookup at run time.
+        for finger in range(0, 6):
+            fstr = str(finger)
+
+            # Explicit finger count delays inherit from 0 finger count delays
+            delays = self.delays.get('0', {}).copy()
+
+            for key in self.motions:
+                motion, finger = key if isinstance(key, tuple) else (key, '0')
+                if finger != fstr:
+                    continue
+
+                delay = motion.split('+', maxsplit=1)[1] \
+                        if '+' in motion else '0'
+                delays[float(delay)] = key
+
+            # Delays are sorted by highest numeric value so we can
+            # search for the largest delay first at run time.
+            if delays:
+                self.delays[fstr] = dict(sorted(delays.items(), reverse=True))
 
     def end(self):
         'Action this gesture at the end of a motion sequence'
-        self.action('on')
+        delay = monotonic() - self.starttime
+        motion, command = 'on', ''
+        delays = self.delays.get(self.fingers or '0')
+        if delays:
+            # Work out which command to run based on delay. Action the
+            # largest configured delay that is less than or equal to the
+            # actual delay.
+            for dvalue in delays:
+                if delay >= dvalue:
+                    motion = delays[dvalue]
+                    command = self.motions.get(motion)
+                    break
+        elif delay > 0:
+            # Define which time hold was released for debug monitoring
+            motion = f'on-{delay:.2f}'
+
+        self.action(motion, command=command)
 
 # Table of configuration commands
-conf_commands = OrderedDict()
+conf_commands = {}
 
 def add_conf_command(func):
     'Add configuration command to command lookup table based on name'
@@ -635,10 +706,17 @@ def read_conf(conffile, defname):
 
     # Read and process the conf file
     get_conf(confpath, confname)
+
+    # Complete any final configuration required
+    for h in handlers.values():
+        h.complete_setup()
+
     return confname
 
-def lockcheck():
-    'Listen on DBus to set session_locked state'
+def dbus_listener():
+    'Listen on DBus'
+    DBusGMainLoop(set_as_default=True)
+
     def proc(busname, vals, _):
         global session_locked
         if busname == 'org.freedesktop.login1.Session':
@@ -646,7 +724,7 @@ def lockcheck():
             if val is not None:
                 session_locked = bool(val)
 
-    DBusGMainLoop(set_as_default=True)
+    # Listen to get session locked state
     dbus.SystemBus().add_signal_receiver(
         proc,
         'PropertiesChanged',
@@ -774,7 +852,7 @@ def main():
     command = f'stdbuf -oL -- {cmd_debug_events}{devstr}'
 
     if dbus_imported:
-        t = threading.Thread(target=lockcheck)
+        t = threading.Thread(target=dbus_listener)
         t.daemon = True
         t.start()
 
@@ -804,7 +882,7 @@ def main():
             continue
 
         # Split received message line into relevant fields
-        dev, gevent, time, other = line.strip().split(maxsplit=3)
+        dev, gevent, timesec, other = line.strip().split(maxsplit=3)
         try:
             gesture, event = gevent[8:].split('_')
         except Exception:

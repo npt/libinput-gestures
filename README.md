@@ -107,7 +107,8 @@ and options described in that file. The available gestures are:
 |`pinch out`           |GNOME open/close overview |
 |`pinch clockwise`     ||
 |`pinch anticlockwise` ||
-|`hold on` ([available since libinput 1.19](#hold-gestures)) |Open new web browser tab |
+|`hold on`             |Open new web browser tab. See description of [hold gestures](#hold-gestures). |
+|`hold on+N` (for `N` seconds, e.g. 1.5) |After extra hold time delay, close browser tab. See description of [hold gestures](#hold-gestures). |
 
 NOTE: If you don't use "natural" scrolling direction for your touchpad
 then you may want to swap the default left/right and up/down
@@ -297,15 +298,43 @@ can completely manage browser tabs from your touchpad.
 Libinput version 1.19.0 added [HOLD
 gestures](https://wayland.freedesktop.org/libinput/doc/latest/gestures.html#hold-gestures)
 to augment the standard SWIPE and PINCH gestures. They are actioned with
-1 or more fingers and are simply set ON as a trigger. They are not as
-versatile as the other gestures but they are a distinct new gesture so
-`libinput-gestures` does interpret them and map them to commands you can
+1 or more fingers after holding them for a small time period and are
+simply set ON as a trigger.
+`libinput-gestures` interprets them to commands you can
 configure in your `libinput-gestures.conf`, e.g:
 
     gesture hold on 4 xdotool key control+t
 
 The above gesture will open a new tab in your browser if you rest 4
-fingers statically on the touchpad.
+fingers statically on the touchpad. If you don't specify a finger count
+then the command is executed when any number of fingers are used for the
+hold.
+
+Optionally, you can configure a time delay on hold gestures to map
+longer hold times to different commands. Any extra hold time can be
+specified, as an integer or float value in decimal seconds. E.g. `on+1`
+is a hold + 1 extra second, `on+3.5` is a hold + 3.5 extra seconds, etc.
+These can be configured in addition to `on` (which is effectively the
+same as `on+0`), and also with different (or no specific) finger counts,
+e.g:
+
+    gesture hold on 4 xdotool key control+t
+    gesture hold on+2.2 4 xdotool key control+w
+
+The above will configure a second 4 finger hold gesture which, after 2.2
+extra seconds to a normal hold, will close the current tab in your
+browser. You can configure as many hold gestures, with different times
+and finger counts (or no specific finger count), as you like but it will
+quickly get unworkable if you add too many, or with close delays.
+
+To get an idea of suitable hold times to configure, comment out all hold
+gestures in your configuration file `libinput-gestures.conf` and run
+with debug output. I.e. run `libinput-gestures -d` in a terminal window
+(you may have to temporarily disable `libinput-gestures` first by
+running `libinput-gestures-setup stop`). Then experiment with different
+holds which will print the times to the screen so you can choose what to
+configure for your hold gestures. Run `libinput-gestures-setup restart`
+to restart `libinput-gestures` after updating your configuration.
 
 ### AUTOMATIC STOP/RESTART ON D-BUS EVENTS SUCH AS SUSPEND
 
