@@ -256,20 +256,32 @@ Note if you run `libinput-gestures` on GNOME with Wayland, be sure to
 change or disable the your `libinput-gestures.conf` configured gestures
 to not clash with the native gestures.
 
-GNOME 40.0 and later on Wayland natively implements the following
+GNOME 3.38 and earlier on Wayland natively implements the following
+gestures:
+
+- 3 finger pinch opens/close the GNOME overview.
+- 4 finger swipe up/down changes workspaces
+
+GNOME 40->46 on Wayland natively implements the following
 gestures:
 
 - 3 finger swipe up/down opens the GNOME overview.
 - 3 finger swipe left/right changes workspaces
 
-GNOME 40.0 does not use 4 finger gestures so you can freely assign them
-using `libinput-gestures`.
+Note that GNOME 40->46 does not use 4 finger gestures so you can freely
+assign them using `libinput-gestures`.
 
-GNOME 3.38 on Wayland and earlier natively implements the following
-gestures:
+GNOME 47 and above implements the same gestures as GNOME 40->46 but also
+duplicates those gestures to 4 finger gestures so you can't use them for
+libinput-gestures unless you do one of the following to disable 3 finger
+gestures in GNOME.
 
-- 3 finger pinch opens/close the GNOME overview.
-- 4 finger swipe up/down changes workspaces
+1. Install the [_Disable 3 Finger
+   Gestures_](https://extensions.gnome.org/extension/7403/disable-3-finger-gestures/)
+   GNOME shell extension (recommended).
+
+2. Patch `gnome-shell` to stop it using 3 finger gestures using this
+   [patch script](https://gist.github.com/bulletmark/0630478f98363adf584bbcfe8e527cb1).
 
 GNOME on Xorg does not natively implement any gestures.
 
