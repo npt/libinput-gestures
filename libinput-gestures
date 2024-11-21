@@ -878,17 +878,19 @@ def main():
             continue
 
         # Only interested in gestures
-        if 'GESTURE_' not in line:
+        if 'GESTURE_' not in line or ' +' not in line:
             continue
 
         # Split received message line into relevant fields
-        dev, gevent, timesec, other = line.strip().split(maxsplit=3)
+        split1, split2 = line.split(' +', maxsplit=1)
+
+        gevent = split1.split(maxsplit=2)[1]
         try:
             gesture, event = gevent[8:].split('_')
         except Exception:
             continue
 
-        fingers, *argslist = other.split(maxsplit=1)
+        _, fingers, *argslist = split2.split(maxsplit=2)
         params = argslist[0] if argslist else ''
 
         # Action each type of event
