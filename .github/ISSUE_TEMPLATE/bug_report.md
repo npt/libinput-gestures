@@ -6,7 +6,6 @@ labels: ''
 assignees: bulletmark
 
 ---
-
 Before creating a new issue, please follow each step in the TROUBLESHOOTING section
 of the main README.
 
