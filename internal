@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-'Command line program to exercise/test/debug the _internal command.'
+"Command line program to exercise/test/debug the _internal command."
 # Mark Blakeney, Oct 2019
 
 from __future__ import annotations
 
-import sys
-import importlib
 import argparse
+import importlib
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -16,35 +16,34 @@ PROG = Path(sys.argv[0]).resolve()
 NAME = Path.cwd().name
 CACHE = Path.home() / '.cache' / PROG.name
 
+
 def import_path(pathstr: str) -> Any:
-    'Import given module path'
+    "Import given module path"
     path = Path(pathstr)
     modname = path.stem.replace('-', '_')
-    spec = importlib.util.spec_from_loader(modname,  # type: ignore
-              importlib.machinery.SourceFileLoader(modname, pathstr))  # type: ignore
+    spec = importlib.util.spec_from_loader(  # type: ignore
+        modname,
+        importlib.machinery.SourceFileLoader(modname, pathstr),  # type: ignore
+    )
     module = importlib.util.module_from_spec(spec)  # type: ignore
     spec.loader.exec_module(module)
     return module
 
+
 opt = argparse.ArgumentParser(description=__doc__)
-opt.add_argument('-c', '--conffile',
-        help='alternative configuration file')
-opt.add_argument('-i', '--initial', type=int,
-        help='initial desktop')
-opt.add_argument('-C', '--cols', type=int, default=1,
-        help='number of columns')
-opt.add_argument('-t', '--text', action='store_true',
-        help='output desktop change in text')
-opt.add_argument('-n', '--nocache', action='store_true',
-        help='do not use cache')
-opt.add_argument('num', type=int,
-        help='number of desktops')
-opt.add_argument('action', nargs='?',
-        help='action to perform')
-opt.add_argument('-d', '--display', type=int,
-        help=argparse.SUPPRESS)
+opt.add_argument('-c', '--conffile', help='alternative configuration file')
+opt.add_argument('-i', '--initial', type=int, help='initial desktop')
+opt.add_argument('-C', '--cols', type=int, default=1, help='number of columns')
+opt.add_argument(
+    '-t', '--text', action='store_true', help='output desktop change in text'
+)
+opt.add_argument('-n', '--nocache', action='store_true', help='do not use cache')
+opt.add_argument('num', type=int, help='number of desktops')
+opt.add_argument('action', nargs='?', help='action to perform')
+opt.add_argument('-d', '--display', type=int, help=argparse.SUPPRESS)
 opt.add_argument('-s', '--set', type=int, help=argparse.SUPPRESS)
 args = opt.parse_args()
+
 
 def showgrid(pos: int, num: int, cols: int) -> None:
     print()
@@ -57,6 +56,7 @@ def showgrid(pos: int, num: int, cols: int) -> None:
             print(' ** ', end=end)
     if end != '\n':
         print()
+
 
 if args.set is not None:
     print(args.set)
@@ -102,8 +102,7 @@ else:
     end = start
 
 if end < 0 or end >= args.num:
-    sys.exit(f'Desktop change from {start} to {end}, '
-            f'out of range 0 to <{args.num}!')
+    sys.exit(f'Desktop change from {start} to {end}, out of range 0 to <{args.num}!')
 
 if args.text:
     if start != end:

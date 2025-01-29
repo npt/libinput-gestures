@@ -34,5 +34,8 @@ check:
 test:
 	@./internal-test
 
+format:
+	ruff check --select I --fix $(PYFILES) && ruff format $(PYFILES)
+
 clean:
 	rm -rf __pycache__
