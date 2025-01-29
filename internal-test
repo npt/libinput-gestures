@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 'Command line utility to run test suite for internal command.'
 # Mark Blakeney, Oct 2019
+
+from __future__ import annotations
+
 import argparse
 import subprocess
 import sys
@@ -420,7 +423,7 @@ args = opt.parse_args()
 lastnum = 0
 lastpos = 0
 
-def test(fname, action, end, num=-1, start=-1):
+def test(fname: str, action: str, end: int, num: int = -1, start: int = -1) -> str | None:
     global lastnum, lastpos
     if num < 0:
         num = lastnum
@@ -468,7 +471,7 @@ for testset, (title, confstr, tests) in enumerate(TESTS, 1):
         if args.list:
             continue
 
-        res = test(tmpfile.name, *fargs)
+        res = test(tmpfile.name, *fargs)  # type: ignore
         if res:
             print(f' FAILED: {fargs}: {res}')
             bad += 1

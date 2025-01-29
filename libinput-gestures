@@ -18,9 +18,9 @@ from time import monotonic
 
 dbus_imported = True
 try:
-    import dbus
-    from dbus.mainloop.glib import DBusGMainLoop
-    from gi.repository import GLib
+    import dbus  # type: ignore
+    from dbus.mainloop.glib import DBusGMainLoop  # type: ignore
+    from gi.repository import GLib  # type: ignore
 except ImportError:
     dbus_imported = False
 
