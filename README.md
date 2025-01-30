@@ -44,6 +44,13 @@ to read the touchpad device:
 
 After executing the above command, reboot your system.
 
+**Note** adding yourself to the `input` group makes ALL `/dev/input`
+devices readable by your user account and some consider this a security
+risk. If you are concerned then consider adding a udev rule to apply a
+dynamic user ACL as [described
+here](https://wiki.archlinux.org/title/Udev#Allowing_regular_users_to_use_devices),
+rather than adding yourself to the `input` group.
+
 Most/many users will require to install the following although neither are
 actual dependencies because some custom configurations will not require
 them. If you are unsure initially, install both of them.
