@@ -156,8 +156,9 @@ def get_device_info(name, cmd_list_devices, device_list):
         return None
 
     # Otherwise filter for devices with touchpad capabilities
-    touchpads = [d for d in devices if 'size' in d and 'pointer' in
-                 d.get('capabilities', {})]
+    touchpads = [
+        d for d in devices if 'size' in d and 'pointer' in d.get('capabilities', {})
+    ]
 
     if touchpads:
         devices = touchpads
