@@ -9,7 +9,6 @@ import subprocess
 import sys
 import tempfile
 
-# flake8: noqa: E122
 TESTS = (
     #####
     (

@@ -976,7 +976,7 @@ def main():
             continue
 
         _, fingers, *argslist = split2.split(maxsplit=2)
-        params = argslist[0] if argslist else ''
+        params = argslist[0].rstrip() if argslist else ''
 
         # Action each type of event
         if event == 'UPDATE':
@@ -984,7 +984,7 @@ def main():
                 # Split parameters into list of clean numbers
                 if not handler.update(re.split(r'[^-.\d]+', params)):
                     print(
-                        'Could not parse {gesture} {event}: {params}', file=sys.stderr
+                        f'Could not parse {gesture} {event}: {params}', file=sys.stderr
                     )
 
         elif event == 'BEGIN':
